@@ -1,0 +1,58 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Contrôleur HTTP piscine",
+        "description": "Indiquez l'adresse IP de l'Arduino / module web qui accepte les commandes HTTP GET (comme dans eedomus).",
+        "data": {
+          "host": "Adresse IP",
+          "port": "Port"
+        },
+        "data_description": {
+          "host": "Exemple : 192.168.23.241",
+          "port": "80 par défaut"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Impossible de joindre cette IP. Vérifiez l'adresse et que le module est allumé."
+    },
+    "abort": {
+      "already_configured": "Ce contrôleur est déjà configuré"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Gérer les actionneurs",
+        "menu_options": {
+          "add": "Ajouter un actionneur",
+          "remove": "Supprimer un actionneur"
+        }
+      },
+      "add": {
+        "title": "Ajouter un actionneur",
+        "description": "Chaque commande est envoyée en HTTP GET vers http://IP/chaine. Exemple : on = ouvre → {example_url}",
+        "data": {
+          "name": "Nom",
+          "on_path": "Chaîne ON / ouvrir",
+          "off_path": "Chaîne OFF / fermer"
+        },
+        "data_description": {
+          "name": "Nom affiché dans Home Assistant (ex. Cascade Piscine)",
+          "on_path": "Chemin après l'IP, ex. ouvre",
+          "off_path": "Chemin après l'IP, ex. ferme"
+        }
+      },
+      "remove": {
+        "title": "Supprimer des actionneurs",
+        "data": {
+          "actuators_to_remove": "Actionneurs à supprimer"
+        }
+      }
+    },
+    "error": {
+      "invalid_paths": "Le nom et les deux chaînes de commande sont obligatoires"
+    }
+  }
+}
