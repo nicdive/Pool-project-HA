@@ -35,10 +35,12 @@ Installation manuelle possible : copier `custom_components/pool_http_actuators` 
 
 ### Versioning
 
-- `manifest.json` → `"version": "0.1.1"`
+- `manifest.json` → `"version": "0.1.2"`
 - Release GitHub tag → même numéro (obligatoire pour que HACS affiche une vraie version, pas un hash de commit)
 
-Les entités s’affichent sous leur nom court (`Cascade`, `Éclairage`, …), rattachées au device contrôleur `Pool HTTP (<IP>)`.
+Affichage : nom d’entité = nom saisi (`Cascade`, …), sans préfixe IP.  
+Nouveaux `entity_id` suggérés : `switch.cascade`, etc.  
+Les IDs déjà créés (ex. `switch.pool_http_192_168_23_241_cascade`) se renomment dans Paramètres de l’entité.
 
 https://github.com/nicdive/Pool-project-HA/releases
 

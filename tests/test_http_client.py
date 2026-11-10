@@ -1,4 +1,4 @@
-"""Unit tests for PoolHttpClient URL building (no Home Assistant required)."""
+"""Unit tests for PoolHttpClient / helpers (no Home Assistant required)."""
 
 from __future__ import annotations
 
@@ -30,8 +30,10 @@ _pkg.__path__ = [str(PKG_DIR)]
 sys.modules[PKG] = _pkg
 _load_module(f"{PKG}.const", PKG_DIR / "const.py")
 _http = _load_module(f"{PKG}.http_client", PKG_DIR / "http_client.py")
+_helpers = _load_module(f"{PKG}.helpers", PKG_DIR / "helpers.py")
 PoolHttpClient = _http.PoolHttpClient
 PoolHttpClientError = _http.PoolHttpClientError
+slugify = _helpers.slugify
 
 
 class FakeResponse:
@@ -94,6 +96,17 @@ class TestPoolHttpClient(unittest.TestCase):
 
         with self.assertRaises(PoolHttpClientError):
             asyncio.run(_run())
+
+
+class TestSlugify(unittest.TestCase):
+    def test_basic(self) -> None:
+        self.assertEqual(slugify("Cascade"), "cascade")
+
+    def test_accents(self) -> None:
+        self.assertEqual(slugify("Éclairage"), "eclairage")
+
+    def test_spaces(self) -> None:
+        self.assertEqual(slugify("Pompe pH"), "pompe_ph")
 
 
 if __name__ == "__main__":
