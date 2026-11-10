@@ -16,18 +16,22 @@ La barrette relais Ethernet remplacera ça ensuite ; cette intégration reste ut
 
 Pas de `/status` côté Arduino → l’état du switch HA est **optimiste**.
 
-### Installation
+### Installation (HACS — recommandé)
 
-1. Copier le dossier `custom_components/pool_http_actuators` dans  
-   `/config/custom_components/` de Home Assistant.
-2. Redémarrer Home Assistant.
-3. **Paramètres → Appareils et services → Ajouter une intégration**  
-   → **Pool HTTP Actuators**.
-4. Saisir l’IP du module (ex. `192.168.24.142` ou celle vue dans eedomus).
-5. Ouvrir l’intégration → **Configurer** → **Ajouter un actionneur** :
+Repo GitHub : **`nicdive/Pool-project-HA`**
+
+1. HACS → **Integrations** → ⋮ → **Custom repositories**
+2. Repository : `nicdive/Pool-project-HA` — Category : **Integration**
+3. Installer **Pool HTTP Actuators**, puis redémarrer Home Assistant
+4. **Paramètres → Appareils et services → Ajouter une intégration**  
+   → **Pool HTTP Actuators**
+5. Saisir l’IP du module (ex. `192.168.24.142` ou celle vue dans eedomus)
+6. Ouvrir l’intégration → **Configurer** → **Ajouter un actionneur** :
    - **Nom** : `Cascade Piscine`
    - **Chaîne ON** : `ouvre`
    - **Chaîne OFF** : `ferme`
+
+Installation manuelle possible : copier `custom_components/pool_http_actuators` dans `/config/custom_components/`.
 
 Pour d’autres relais sur le même Arduino (si tu ajoutes des routes), répéter l’ajout avec d’autres chaînes.  
 Pour un autre IP, ajouter une 2ᵉ instance de l’intégration.
