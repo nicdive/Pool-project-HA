@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 from typing import Any
 import uuid
 
@@ -31,6 +32,8 @@ from .const import (
 )
 from .http_client import PoolHttpClient
 
+_LOGGER = logging.getLogger(__name__)
+
 STEP_USER_DATA_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_HOST): selector.TextSelector(
@@ -56,8 +59,6 @@ class PoolHttpActuatorsConfigFlow(ConfigFlow, domain=DOMAIN):
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
         """Ask for controller IP (and optional port)."""
-        errors: dict[str, str] = {}
-
         if user_input is not None:
             host = str(user_input[CONF_HOST]).strip()
             port = int(user_input.get(CONF_PORT, DEFAULT_PORT))
@@ -65,21 +66,26 @@ class PoolHttpActuatorsConfigFlow(ConfigFlow, domain=DOMAIN):
             await self.async_set_unique_id(f"{host}:{port}")
             self._abort_if_unique_id_configured()
 
+            # Soft check only: Arduino may be offline during setup; commands
+            # will still work once the module is reachable.
             session = async_get_clientsession(self.hass)
             client = PoolHttpClient(session, host, port)
             if not await client.async_test_connection():
-                errors["base"] = "cannot_connect"
-            else:
-                return self.async_create_entry(
-                    title=f"Pool HTTP ({host})",
-                    data={CONF_HOST: host, CONF_PORT: port},
-                    options={CONF_ACTUATORS: []},
+                _LOGGER.warning(
+                    "Pool HTTP controller %s:%s not reachable during setup",
+                    host,
+                    port,
                 )
+
+            return self.async_create_entry(
+                title=f"Pool HTTP ({host})",
+                data={CONF_HOST: host, CONF_PORT: port},
+                options={CONF_ACTUATORS: []},
+            )
 
         return self.async_show_form(
             step_id="user",
             data_schema=STEP_USER_DATA_SCHEMA,
-            errors=errors,
         )
 
     @staticmethod
