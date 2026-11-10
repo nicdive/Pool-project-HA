@@ -1,0 +1,58 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Pool HTTP controller",
+        "description": "Enter the IP address of the Arduino / web relay that accepts HTTP GET commands (same as in eedomus).",
+        "data": {
+          "host": "IP address",
+          "port": "Port"
+        },
+        "data_description": {
+          "host": "Example: 192.168.23.241",
+          "port": "Default 80"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Cannot reach this IP. Check the address and that the module is powered."
+    },
+    "abort": {
+      "already_configured": "This controller is already configured"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Manage actuators",
+        "menu_options": {
+          "add": "Add an actuator",
+          "remove": "Remove an actuator"
+        }
+      },
+      "add": {
+        "title": "Add an actuator",
+        "description": "Each command is sent as HTTP GET to http://IP/string. Example: on = ouvre → {example_url}",
+        "data": {
+          "name": "Name",
+          "on_path": "ON / open string",
+          "off_path": "OFF / close string"
+        },
+        "data_description": {
+          "name": "Displayed name in Home Assistant (e.g. Cascade Piscine)",
+          "on_path": "Path after the IP, e.g. ouvre",
+          "off_path": "Path after the IP, e.g. ferme"
+        }
+      },
+      "remove": {
+        "title": "Remove actuators",
+        "data": {
+          "actuators_to_remove": "Actuators to remove"
+        }
+      }
+    },
+    "error": {
+      "invalid_paths": "Name and both command strings are required"
+    }
+  }
+}
