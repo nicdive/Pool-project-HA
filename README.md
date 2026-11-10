@@ -35,10 +35,12 @@ Installation manuelle possible : copier `custom_components/pool_http_actuators` 
 
 ### Versioning
 
-- `manifest.json` → `"version": "0.1.0"`
-- Release GitHub tag → `0.1.0` (obligatoire pour que HACS affiche une vraie version, pas un hash de commit)
+- `manifest.json` → `"version": "0.1.1"`
+- Release GitHub tag → même numéro (obligatoire pour que HACS affiche une vraie version, pas un hash de commit)
 
-https://github.com/nicdive/Pool-project-HA/releases/tag/0.1.0
+Les entités s’affichent sous leur nom court (`Cascade`, `Éclairage`, …), rattachées au device contrôleur `Pool HTTP (<IP>)`.
+
+https://github.com/nicdive/Pool-project-HA/releases
 
 Pour d’autres relais sur le même Arduino (si tu ajoutes des routes), répéter l’ajout avec d’autres chaînes.  
 Pour un autre IP, ajouter une 2ᵉ instance de l’intégration.

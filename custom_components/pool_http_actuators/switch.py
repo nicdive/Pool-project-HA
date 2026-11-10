@@ -8,6 +8,7 @@ from typing import Any
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
+from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
@@ -34,6 +35,20 @@ async def async_setup_entry(
 ) -> None:
     """Set up switches from config entry options."""
     client = entry.runtime_data
+    host: str = entry.data[CONF_HOST]
+    port: int = entry.data.get(CONF_PORT, DEFAULT_PORT)
+
+    # Parent device = the HTTP controller (IP). Actuators hang under it.
+    device_registry = dr.async_get(hass)
+    device_registry.async_get_or_create(
+        config_entry_id=entry.entry_id,
+        identifiers={(DOMAIN, f"{host}:{port}")},
+        name=f"Pool HTTP ({host})",
+        manufacturer="Arduino / HTTP relay",
+        model="Web GET controller",
+        configuration_url=client.base_url,
+    )
+
     actuators = entry.options.get(CONF_ACTUATORS, [])
     async_add_entities(
         [
@@ -47,7 +62,10 @@ class PoolHttpActuatorSwitch(SwitchEntity):
     """HTTP GET switch with optimistic state (no feedback from Arduino yet)."""
 
     _attr_should_poll = False
-    _attr_has_entity_name = False
+    # Entity has no own name → UI shows only the device name (e.g. "Cascade"),
+    # not "Pool HTTP (IP) Cascade".
+    _attr_has_entity_name = True
+    _attr_name = None
 
     def __init__(
         self,
@@ -59,19 +77,22 @@ class PoolHttpActuatorSwitch(SwitchEntity):
         self._on_path: str = actuator[CONF_ON_PATH]
         self._off_path: str = actuator[CONF_OFF_PATH]
         self._actuator_id: str = actuator[CONF_ACTUATOR_ID]
+        self._actuator_label: str = actuator["name"]
 
         host = entry.data[CONF_HOST]
         port = entry.data.get(CONF_PORT, DEFAULT_PORT)
+        controller_id = f"{host}:{port}"
 
-        self._attr_name = actuator["name"]
         self._attr_unique_id = f"{entry.entry_id}_{self._actuator_id}"
         self._attr_is_on = False
+        # One device per actuator so the visible name is just "Cascade", etc.
         self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, f"{host}:{port}")},
-            name=f"Pool HTTP ({host})",
+            identifiers={(DOMAIN, f"{controller_id}:{self._actuator_id}")},
+            name=actuator["name"],
             manufacturer="Arduino / HTTP relay",
-            model="Web GET controller",
+            model="HTTP GET actuator",
             configuration_url=client.base_url,
+            via_device=(DOMAIN, controller_id),
         )
 
     async def async_turn_on(self, **kwargs: Any) -> None:
@@ -86,11 +107,16 @@ class PoolHttpActuatorSwitch(SwitchEntity):
         try:
             await self._client.async_send_command(path)
         except PoolHttpClientError as err:
-            _LOGGER.error("Command failed for %s (%s): %s", self.name, path, err)
+            _LOGGER.error(
+                "Command failed for %s (%s): %s",
+                self._actuator_label,
+                path,
+                err,
+            )
             raise HomeAssistantError(
                 f"Impossible d'envoyer la commande « {path} » : {err}"
             ) from err
 
-        # Optimistic: no status endpoint known until Arduino sketch is reviewed
+        # Optimistic: no status endpoint in current Arduino sketch
         self._attr_is_on = assumed_on
         self.async_write_ha_state()
